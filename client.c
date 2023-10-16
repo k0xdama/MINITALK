@@ -6,7 +6,7 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:54 by pmateo            #+#    #+#             */
-/*   Updated: 2023/09/28 03:14:28 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/10/16 16:29:50 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,3 +15,14 @@
 #include <signal.h>
 
 void	client()
+{
+    
+}
+
+int main(int argc, char *argv[])
+{
+    if (argc != 1)
+        return (1);
+    
+    
+}

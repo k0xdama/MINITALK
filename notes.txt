@@ -1,0 +1,9 @@
+La premiere chose a faire serait de creer deux programmes, un serveur et un client, pour le moment seulement 
+en essayant de respecter ces consignes :
+    - Le serveur, a son lancement doit afficher son PID et rester en attente d'un signal.
+    - Le client lui pour le moment ne prends qu'un seul parametre, le PID du serveur.
+    - Le client envoie un signal (lequel ?) au serveur.
+    - Lorsque le serveur recoit le signal du client il ecrira sur l'entree standard qu'il l'a bien recu.
+ Etape : 0/4
+
+ 
