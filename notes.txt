@@ -2,8 +2,14 @@ La premiere chose a faire serait de creer deux programmes, un serveur et un clie
 en essayant de respecter ces consignes :
     - Le serveur, a son lancement doit afficher son PID et rester en attente d'un signal.
     - Le client lui pour le moment ne prends qu'un seul parametre, le PID du serveur.
-    - Le client envoie un signal (lequel ?) au serveur.
+    - Le client envoie un signal au serveur.
     - Lorsque le serveur recoit le signal du client il ecrira sur l'entree standard qu'il l'a bien recu.
- Etape : 0/4
+ Etape : 4/4
 
+SERVEUR :
+SIGUSR1 = reception des caracteres
+SIGUSR2 = envoi de la confirmation de bonne reception
+
+CLIENT :
+SIGUSR1 = 
  

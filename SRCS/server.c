@@ -6,37 +6,41 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:57 by pmateo            #+#    #+#             */
-/*   Updated: 2023/10/16 20:27:30 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/10/19 19:40:08 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "server.h"
+#include "../INCLUDES/server.h"
 
-void	handler(int signb)
+pid_t	senderPID;
+
+void	handler_usr1(int signo, siginfo_t *info, void __attribute__((unused)) *context)
 {
-	
-}
-
-void	server()
-{
-	pause();
-	
-
+	if (signo == SIGUSR1)
+	{
+		senderPID = info->si_pid;
+		if (senderPID > 0)
+			kill(senderPID, SIGUSR1);
+	}
 }
 
 int	main(void)
 {
 	pid_t	pid;
-	struct sigaction	managSignal;
+	struct sigaction	msignal;
 
-	
-	
-	managSignal.sa_handler = &handler;
-	managSignal.sa_flags = 0;
-	sigemptyset(&managSignal.sa_mask);	
+	senderPID = -1;
+	msignal.sa_sigaction = &handler_usr1;
+	msignal.sa_flags = SA_SIGINFO;
+	sigemptyset(&msignal.sa_mask);	
 	pid = getpid();
-	printf("SERVER PID : %d", (int)pid);
-	server();
-	
-	
+	printf("SERVER PID : %d\n", (int)pid);
+	while (1)
+	{
+		printf("En attente...\n");
+		sigaction(SIGUSR1, &msignal, 0);
+		pause();
+		printf("Signal recu d'un client | PID : %d\n", (int)senderPID);
+	}
+	return (0);
 }

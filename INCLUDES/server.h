@@ -1,28 +1,46 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   client.c                                           :+:      :+:    :+:   */
+/*   server.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/09/28 02:59:54 by pmateo            #+#    #+#             */
-/*   Updated: 2023/10/16 16:29:50 by pmateo           ###   ########.fr       */
+/*   Created: 2023/10/16 17:47:41 by pmateo            #+#    #+#             */
+/*   Updated: 2023/10/19 17:36:16 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#ifndef SERVER_H
+# define SERVER_H
+
 #include <unistd.h>
 #include <stdio.h>
+#include <stddef.h>
 #include <signal.h>
+#include <sys/types.h>
 
-void	client()
-{
-    
-}
 
-int main(int argc, char *argv[])
-{
-    if (argc != 1)
-        return (1);
-    
-    
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#endif
