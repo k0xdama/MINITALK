@@ -6,10 +6,22 @@ en essayant de respecter ces consignes :
     - Lorsque le serveur recoit le signal du client il ecrira sur l'entree standard qu'il l'a bien recu.
  Etape : 4/4
 
-SERVEUR :
-SIGUSR1 = reception des caracteres
-SIGUSR2 = envoi de la confirmation de bonne reception
+##################SERVEUR###################
+A GERER :
+SIGUSR1 = bit a 2;
+SIGUSR2 = bit a 1;
+A ENVOYER :
+SIGUSR1 = pret a recevoir le prochain octet;
+SIGUSR1 = a recu l'entierete du message;
+##################CLIENT##########################
+A GERER :
+SIGUSR1 = serveur pret a recevoir le prochain octet;
+SIGUSR2 = serveur a recu l'entierete du message;
+A ENVOYER :
+SIGUSR1 = bit a 0;
+SIGUSR2 = bit a 1;
 
-CLIENT :
-SIGUSR1 = 
- 
+RECEPTION DES CARACTERES :
+CHAINE A TRANSMETTRE = "Hello World" -> "
+
+

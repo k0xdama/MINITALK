@@ -6,7 +6,7 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:54 by pmateo            #+#    #+#             */
-/*   Updated: 2023/10/19 19:46:54 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/10/21 18:37:11 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,34 +29,44 @@ int	ft_atoi(const char *str)
 	return (num);
 }
 
-void	handler_usr1(int signo)
+void	handler_usr(int signo)
 {
 	if (signo == SIGUSR1)
 		checking = 1;
 }
 
+int	byte_cutting()
+void	send_sigusr(pid_t servPID, int choice)
+{
+	if (servPID <= 0)
+		printf("Le PID renseigne est invalide");
+	else if (choice != -1)
+	{
+		if (choice == 1)
+			kill(servPID, SIGUSR1);
+		else if (choice == 2)
+			kill(servPID, SIGUSR2);
+	}
+	else
+		printf("Echec de l'envoi d'un signal !");
+}
+
 int main(int argc, char *argv[])
 {
-    int servPID;
+    pid_t servPID;
 	struct sigaction	msignal;
+	char *message;
 	
-
-    servPID = 0;
-	checking = 0;
-    if (argc != 2)
+	if (argc != 3)
         return (1);
-    servPID = ft_atoi(argv[1]);
-	msignal.sa_handler = &handler_usr1;
+    servPID = 0;
+	message = argv[3];
+    servPID = (pid_t)ft_atoi(argv[1]);
+	msignal.sa_handler = &handler_usr;
 	msignal.sa_flags = 0;
 	sigemptyset(&msignal.sa_mask);
 	sigaction(SIGUSR1, &msignal, 0);
-    if (servPID <= 0)
-        printf("Le PID renseigne est invalide\n");
-	else
-	{
-        kill(servPID, SIGUSR1);
-		printf("Signal envoye...\n");
-	}
+    
 	printf("En attente d'une confirmation de reception....\n");
 	pause();
     if (checking == 1)

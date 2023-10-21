@@ -6,7 +6,7 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:57 by pmateo            #+#    #+#             */
-/*   Updated: 2023/10/19 19:40:08 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/10/21 16:08:57 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,4 +43,6 @@ int	main(void)
 		printf("Signal recu d'un client | PID : %d\n", (int)senderPID);
 	}
 	return (0);
+
+	
 }
