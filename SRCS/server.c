@@ -6,7 +6,7 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:57 by pmateo            #+#    #+#             */
-/*   Updated: 2023/10/21 16:08:57 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/10/23 20:47:02 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,9 @@
 
 pid_t	senderPID;
 
-void	handler_usr1(int signo, siginfo_t *info, void __attribute__((unused)) *context)
+void	handler_sig(int signo, siginfo_t *info, void __attribute__((unused)) *context)
 {
+	senderPID = info->si_pid;
 	if (signo == SIGUSR1)
 	{
 		senderPID = info->si_pid;
@@ -30,7 +31,7 @@ int	main(void)
 	struct sigaction	msignal;
 
 	senderPID = -1;
-	msignal.sa_sigaction = &handler_usr1;
+	msignal.sa_sigaction = &handler_sig;
 	msignal.sa_flags = SA_SIGINFO;
 	sigemptyset(&msignal.sa_mask);	
 	pid = getpid();

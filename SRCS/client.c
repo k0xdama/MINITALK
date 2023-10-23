@@ -6,7 +6,7 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:54 by pmateo            #+#    #+#             */
-/*   Updated: 2023/10/21 18:37:11 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/10/23 20:34:01 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,33 @@ void	handler_usr(int signo)
 		checking = 1;
 }
 
-int	byte_cutting()
+void	byte_cutting(pid_t servPID, char *message)
+{
+	int	i;
+	char c;
+	char mask;
+	
+	while (1)
+	{
+		i = 0;
+		c = *message;
+		mask = 1;
+		while (i++ < 8)
+		{
+			mask = mask & c;
+			if (mask == 0)
+				send_sigusr(servPID, 1);
+			else
+				send_sigusr(servPID, 2);
+			mask = 1;
+			mask = mask << i;
+		}
+		if(!(*message))
+			break;
+		message++;
+	}
+}
+
 void	send_sigusr(pid_t servPID, int choice)
 {
 	if (servPID <= 0)
@@ -55,18 +81,16 @@ int main(int argc, char *argv[])
 {
     pid_t servPID;
 	struct sigaction	msignal;
-	char *message;
 	
 	if (argc != 3)
         return (1);
     servPID = 0;
-	message = argv[3];
     servPID = (pid_t)ft_atoi(argv[1]);
 	msignal.sa_handler = &handler_usr;
 	msignal.sa_flags = 0;
 	sigemptyset(&msignal.sa_mask);
 	sigaction(SIGUSR1, &msignal, 0);
-    
+    byte_cutting(servPID, argv[3]);
 	printf("En attente d'une confirmation de reception....\n");
 	pause();
     if (checking == 1)
