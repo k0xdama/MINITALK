@@ -8,7 +8,7 @@ en essayant de respecter ces consignes :
 
 ##################SERVEUR###################
 A GERER :
-SIGUSR1 = bit a 2;
+SIGUSR1 = bit a 0;
 SIGUSR2 = bit a 1;
 A ENVOYER :
 SIGUSR1 = pret a recevoir le prochain octet;
@@ -33,7 +33,5 @@ CHAINE A TRANSMETTRE = "Hello World" -> "
 
 
 
-        128 64 32 16 8 4 2 1
-        0   0  1  0  1 0 1 0
 
 

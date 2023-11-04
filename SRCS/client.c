@@ -6,7 +6,7 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:54 by pmateo            #+#    #+#             */
-/*   Updated: 2023/10/23 20:34:01 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/10/26 01:55:41 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ void	byte_cutting(pid_t servPID, char *message)
 			mask = 1;
 			mask = mask << i;
 		}
+		pause();
 		if(!(*message))
 			break;
 		message++;
@@ -91,9 +92,5 @@ int main(int argc, char *argv[])
 	sigemptyset(&msignal.sa_mask);
 	sigaction(SIGUSR1, &msignal, 0);
     byte_cutting(servPID, argv[3]);
-	printf("En attente d'une confirmation de reception....\n");
-	pause();
-    if (checking == 1)
-		printf("SIGUSR1 a bien ete recu par le serveur !\n");
 	return (0);
 }
