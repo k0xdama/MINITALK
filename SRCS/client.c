@@ -6,7 +6,7 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:54 by pmateo            #+#    #+#             */
-/*   Updated: 2023/10/26 01:55:41 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/11/07 16:08:42 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,11 +33,14 @@ void	handler_usr(int signo)
 {
 	if (signo == SIGUSR1)
 		checking = 1;
+	else if (signo == SIGUSR2)
+		checking = 0;
 }
 
 void	byte_cutting(pid_t servPID, char *message)
 {
 	int	i;
+	int	bytesent = 1;
 	char c;
 	char mask;
 	
@@ -53,12 +56,14 @@ void	byte_cutting(pid_t servPID, char *message)
 				send_sigusr(servPID, 1);
 			else
 				send_sigusr(servPID, 2);
+			printf("byte sent = %d\n", bytesent);
+			bytesent++;
 			mask = 1;
 			mask = mask << i;
 		}
 		pause();
-		if(!(*message))
-			break;
+		if (checking == 0)
+			break; 
 		message++;
 	}
 }
@@ -91,6 +96,7 @@ int main(int argc, char *argv[])
 	msignal.sa_flags = 0;
 	sigemptyset(&msignal.sa_mask);
 	sigaction(SIGUSR1, &msignal, 0);
-    byte_cutting(servPID, argv[3]);
+	sigaction(SIGUSR2, &msignal, 0);
+    byte_cutting(servPID, argv[2]);
 	return (0);
 }
