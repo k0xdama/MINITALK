@@ -6,7 +6,7 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:54 by pmateo            #+#    #+#             */
-/*   Updated: 2023/11/07 16:08:42 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/11/10 18:54:16 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,46 @@
 
 int	checking;
 
-int	ft_atoi(const char *str)
+static size_t	ft_strlen(const char *str)
+{
+	size_t	i;
+
+	i = 0;
+	while (str[i] != '\0')
+		i++;
+	return (i);
+}
+
+static size_t	ft_strlcpy(char *dest, const char *src, size_t size)
+{
+	unsigned int	i;
+
+	i = 0;
+	if (size == 0)
+		return (ft_strlen(src));
+	while (src[i] != '\0' && i < size - 1)
+	{
+		dest[i] = src[i];
+		i++;
+	}
+	dest[i] = '\0';
+	return (ft_strlen(src));
+}
+
+static char	*ft_strdup(const char *s1)
+{
+	size_t	size;
+	char	*s2;
+
+	size = ft_strlen(s1) + 1;
+	s2 = malloc(size * sizeof(char));
+	if (s2 == NULL)
+		return (NULL);
+	ft_strlcpy(s2, s1, size);
+	return (s2);
+}
+
+static int	ft_atoi(const char *str)
 {
 	int	num;
 	int	i;
@@ -31,9 +70,7 @@ int	ft_atoi(const char *str)
 
 void	handler_usr(int signo)
 {
-	if (signo == SIGUSR1)
-		checking = 1;
-	else if (signo == SIGUSR2)
+	if (signo == SIGUSR2)
 		checking = 0;
 }
 
@@ -44,7 +81,8 @@ void	byte_cutting(pid_t servPID, char *message)
 	char c;
 	char mask;
 	
-	while (1)
+	c = 0;
+	while (checking)
 	{
 		i = 0;
 		c = *message;
@@ -62,10 +100,9 @@ void	byte_cutting(pid_t servPID, char *message)
 			mask = mask << i;
 		}
 		pause();
-		if (checking == 0)
-			break; 
 		message++;
 	}
+	printf("Le message a ete envoye\n");
 }
 
 void	send_sigusr(pid_t servPID, int choice)
@@ -87,16 +124,19 @@ int main(int argc, char *argv[])
 {
     pid_t servPID;
 	struct sigaction	msignal;
+	char	*message;
 	
 	if (argc != 3)
         return (1);
-    servPID = 0;
     servPID = (pid_t)ft_atoi(argv[1]);
+	message = ft_strdup(argv[2]);
+	checking = 1;
 	msignal.sa_handler = &handler_usr;
 	msignal.sa_flags = 0;
 	sigemptyset(&msignal.sa_mask);
 	sigaction(SIGUSR1, &msignal, 0);
 	sigaction(SIGUSR2, &msignal, 0);
-    byte_cutting(servPID, argv[2]);
+    byte_cutting(servPID, message);
+	free(message);
 	return (0);
 }

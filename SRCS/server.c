@@ -6,7 +6,7 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:57 by pmateo            #+#    #+#             */
-/*   Updated: 2023/11/07 16:21:17 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/11/10 18:58:56 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,10 +72,11 @@ void	handler_sig(int signo, siginfo_t *info, void __attribute__((unused)) *conte
 	char	ptrc[2];
 	
 	senderPID = info->si_pid;
-	bit = 0;
+	c = 0;
 	ptrc[1] = '\0';
 	while (1)
 	{
+		bit = 0;
 		while (bit++ != 8)
 		{
 			if (signo == SIGUSR1)
@@ -84,15 +85,17 @@ void	handler_sig(int signo, siginfo_t *info, void __attribute__((unused)) *conte
 				c = add_bit(1, c, bit);
 		}
 		ptrc[0] = c;
-		printf("char rebuilt (%c)\n", c);
+		// printf("char rebuilt (%c)\n", c);
 		if (ptrc[0] == 0)
 		{
+			printf("octet nul rencontre\n");
 			kill(senderPID, SIGUSR2);
 			break;
 		}
 		else
 			kill(senderPID, SIGUSR1);
 		message = ft_strjoin(message, ptrc);
+		// printf("message = %s\n", message);
 	}
 }
 
@@ -101,6 +104,8 @@ int	main(void)
 	pid_t	pid;
 	struct sigaction	msignal;
 
+	message = malloc(1 * sizeof(char));
+	message[0] = '\0';
 	msignal.sa_sigaction = &handler_sig;
 	msignal.sa_flags = SA_SIGINFO;
 	sigemptyset(&msignal.sa_mask);
@@ -110,5 +115,6 @@ int	main(void)
 	printf("SERVER READY !\nSERVER PID [%d]\nPENDING...\n", (int)pid);
 	while (1)
 		pause();
+	free(message);
 	return (0);
 }
