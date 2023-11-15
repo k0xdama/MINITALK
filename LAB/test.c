@@ -6,7 +6,7 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/23 19:17:20 by pmateo            #+#    #+#             */
-/*   Updated: 2023/10/23 19:28:49 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/11/15 21:27:44 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,28 @@ int main(void)
         printf("mask = %d\n", (int)mask);
         mask = 1;
         i++;
-        mask = mask << 1;
+        mask = mask << i;
+    }
+}
+
+int main(void)
+{
+    char c1 = '*';
+    char c2 = 0;
+    char mask;
+    int index = 0;
+    
+    while(index < 8)
+    {
+        mask = 1;
+        mask = mask << index;
+        mask = mask & c1;
+        if (mask != 0)
+        {
+          c2 = c2 | mask;
+          index++;
+        }
+        else
+          index++;
     }
 }

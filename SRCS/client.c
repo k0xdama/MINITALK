@@ -6,7 +6,7 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:54 by pmateo            #+#    #+#             */
-/*   Updated: 2023/11/10 18:54:16 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/11/15 18:37:40 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,9 +91,15 @@ void	byte_cutting(pid_t servPID, char *message)
 		{
 			mask = mask & c;
 			if (mask == 0)
+			{
 				send_sigusr(servPID, 1);
+				printf("SIGUSR1 sent !\n");
+			}
 			else
+			{
 				send_sigusr(servPID, 2);
+				printf("SIGUSR2 sent !\n");
+			}
 			printf("byte sent = %d\n", bytesent);
 			bytesent++;
 			mask = 1;
