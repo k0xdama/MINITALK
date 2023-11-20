@@ -11,7 +11,7 @@ A GERER :
 SIGUSR1 = bit a 0;
 SIGUSR2 = bit a 1;
 A ENVOYER :
-SIGUSR1 = pret a recevoir le prochain octet;
+SIGUSR1 = pret a recevoir le prochain bit;
 SIGUSR1 = a recu l'entierete du message;
 ##################CLIENT##########################
 A GERER :
@@ -20,6 +20,10 @@ SIGUSR2 = serveur a recu l'entierete du message;
 A ENVOYER :
 SIGUSR1 = bit a 0;
 SIGUSR2 = bit a 1;
+
+TDL :
+- Le serveur doit prendre le temps de traiter chaque bit... (usleep)
+- Un gestionnaire est appele a chaque nouveau signal... Il ne peut pas a son propre sein traiter d'autre signaux
 
 RECEPTION DES CARACTERES :
 CHAINE A TRANSMETTRE = "Hello World" -> "

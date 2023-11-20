@@ -6,7 +6,7 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/15 18:40:41 by pmateo            #+#    #+#             */
-/*   Updated: 2023/11/15 21:36:53 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/11/20 20:48:21 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,18 +17,17 @@
 #include <signal.h>
 #include <sys/types.h>
 
-char	c = 0;
+char	c;
 
 void	handler_sig(int signo, siginfo_t *info, void __attribute__((unused)) *context)
 {
 	pid_t	senderPID;
-	size_t	bit;
+	static size_t	bit;
 	char	mask;
 
-	bit = 0;
 	mask = 1;
 	senderPID = info->si_pid;
-	while (bit < 8)
+	if (bit < 8)
 	{
 		mask = mask << bit;
 		if (signo == SIGUSR1)
@@ -38,9 +37,13 @@ void	handler_sig(int signo, siginfo_t *info, void __attribute__((unused)) *conte
 			c = c | mask;
 			bit++;
 		}
+		kill(senderPID, SIGUSR1);
 	}
-	printf("char rebuilt = %c\n", c);
-	kill(senderPID, SIGUSR1);
+	else
+	{ 
+		printf("char rebuilt = %c\n", c);
+		kill(senderPID, SIGUSR2);
+	}
 }
 
 int	main(void)
