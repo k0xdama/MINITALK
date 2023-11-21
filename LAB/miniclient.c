@@ -6,7 +6,7 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/15 18:40:42 by pmateo            #+#    #+#             */
-/*   Updated: 2023/11/20 18:47:44 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/11/21 17:13:35 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void	send_sigusr(pid_t servPID, int choice)
 		printf("Echec de l'envoi d'un signal !");
 }
 
-void	cutandsend(pid_t servPID, char c)
+void	cutandsend(pid_t servPID, unsigned char c)
 {
 	int	i;
 	int	bitsent = 0;
@@ -79,6 +79,7 @@ void	cutandsend(pid_t servPID, char c)
 		checking = -42;
 	}
 	printf("char sent to server !\n");
+	kill(servPID, SIGUSR1);
 	pause();
 }
 
@@ -97,12 +98,13 @@ void	servanswer(int signo)
 int main(int argc, char	*argv[])
 {
 	pid_t servPID;
-	char	c;
+	unsigned char	c;
 
 	if (argc != 3)
 		return (1);
 	servPID = (pid_t)ft_atoi(argv[1]);
-	c = *argv[2];
+	c = argv[2][0];
+	printf("c = %c\n", argv[2][0]);
 	signal(SIGUSR1, &handle_next_bit);
 	signal(SIGUSR2, &servanswer);
 	cutandsend(servPID, c);
