@@ -6,11 +6,11 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:57 by pmateo            #+#    #+#             */
-/*   Updated: 2023/11/10 18:58:56 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/11/27 21:18:15 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../INCLUDES/server.h"
+#include "../INCLUDES/minitalk.h"
 
 char	*message;
 
@@ -52,14 +52,13 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (str);
 }
 
-char	add_bit(int bit, char c, size_t index)
+static char	add_bit(char c, size_t bit)
 {
 	char	mask;
 
 	mask = 1;
-	mask = mask << index;
-	if (bit == 1)
-		c = c | mask;
+	mask = mask << bit;
+	c = c | mask;
 	return (c);
 }
 
@@ -67,35 +66,34 @@ char	add_bit(int bit, char c, size_t index)
 void	handler_sig(int signo, siginfo_t *info, void __attribute__((unused)) *context)
 {
 	pid_t	senderPID;
-	size_t	bit;
-	char	c;
-	char	ptrc[2];
+	static size_t	bit;
+	static char	c;
+	static char	ptrc[2];
 	
 	senderPID = info->si_pid;
-	c = 0;
 	ptrc[1] = '\0';
-	while (1)
+	if (bit < 8)
 	{
-		bit = 0;
-		while (bit++ != 8)
+		if (signo == SIGUSR1)
+			bit++;
+		else if (signo == SIGUSR2)
 		{
-			if (signo == SIGUSR1)
-				c = add_bit(0, c, bit);
-			else if (signo == SIGUSR2)
-				c = add_bit(1, c, bit);
+			c = add_bit(c, bit);
+			bit++;
 		}
+		kill(senderPID, SIGUSR1);
+	}
+	if (bit == 8 && c)
+	{
 		ptrc[0] = c;
-		// printf("char rebuilt (%c)\n", c);
-		if (ptrc[0] == 0)
-		{
-			printf("octet nul rencontre\n");
-			kill(senderPID, SIGUSR2);
-			break;
-		}
-		else
-			kill(senderPID, SIGUSR1);
 		message = ft_strjoin(message, ptrc);
-		// printf("message = %s\n", message);
+		bit = 0;
+		c = 0;
+	}
+	else if (bit == 8 && !c)
+	{
+		kill(senderPID, SIGUSR2);
+		printf("CLIENT'S MESSAGE : < %s >\n", message);
 	}
 }
 
@@ -104,7 +102,7 @@ int	main(void)
 	pid_t	pid;
 	struct sigaction	msignal;
 
-	message = malloc(1 * sizeof(char));
+	message = malloc(sizeof(char));
 	message[0] = '\0';
 	msignal.sa_sigaction = &handler_sig;
 	msignal.sa_flags = SA_SIGINFO;

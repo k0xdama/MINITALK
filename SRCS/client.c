@@ -6,11 +6,11 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:54 by pmateo            #+#    #+#             */
-/*   Updated: 2023/11/27 03:26:59 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/11/27 21:50:45 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../INCLUDES/client.h"
+#include "../INCLUDES/minitalk.h"
 
 int	checking = 0;
 
@@ -68,49 +68,7 @@ static int	ft_atoi(const char *str)
 	return (num);
 }
 
-
-
-void	cut_send(pid_t servPID, char c)
-{
-	int	i;
-	char mask;
-	
-	i = 7;
-	mask = 1;
-	while (i >= 0)
-	{
-		mask = mask & c;
-		if (mask == 0)
-		{
-			send_sigusr(servPID, 1);
-			printf("SIGUSR1 sent !\n");			}
-		else
-		{
-			send_sigusr(servPID, 2);
-			printf("SIGUSR2 sent !\n");
-		}
-		printf("byte sent = %d\n", i;
-		i--;
-		mask = 1;
-		mask = mask << i;
-		while (checking != 1)
-			pause();
-		checking = 0;
-	}
-}
-
-void	take_char(pid_t servPID, char *message)
-{
-	while(message)
-	{
-		cut_send(servPID, *message);
-		message++;
-	}
-	printf("MESSAGE SEND\n");
-	return;
-}
-
-void	send_sigusr(pid_t servPID, int choice)
+static	void	send_sigusr(pid_t servPID, int choice)
 {
 	if (servPID <= 0)
 		printf("Le PID renseigne est invalide");
@@ -125,11 +83,53 @@ void	send_sigusr(pid_t servPID, int choice)
 		printf("Echec de l'envoi d'un signal !");
 }
 
+static	void	cut_send(pid_t servPID, char c)
+{
+	int	bit;
+	char mask;
+	
+	bit = 0;
+	mask = 1;
+	while (bit < 8)
+	{
+		mask = mask & c;
+		if (mask == 0)
+		{
+			send_sigusr(servPID, 1);
+			printf("SIGUSR1 sent !\n");			}
+		else
+		{
+			send_sigusr(servPID, 2);
+			printf("SIGUSR2 sent !\n");
+		}
+		printf("bit index = %d\n", bit);
+		bit++;
+		mask = 1;
+		mask = mask << bit;
+		while (checking != 1)
+			pause();
+		checking = 0;
+	}
+}
+
+static	void	take_char(pid_t servPID, char *message)
+{
+	while(1)
+	{
+		cut_send(servPID, *message);
+		if (!(*message))
+			break;
+		message++;
+	}
+	printf("MESSAGE SEND\n");
+	return;
+}
+
 void	handle_sigusr(int signo)
 {
-	if(signo == SIGUSR1)
+	if (signo == SIGUSR1)
 		checking = 1;
-	else
+	else if (signo == SIGUSR2)
 		printf("MESSAGE RECEIVED BY THE SERVER <3\n");
 }
 
@@ -142,9 +142,9 @@ int main(int argc, char *argv[])
         return (1);
     servPID = (pid_t)ft_atoi(argv[1]);
 	message = ft_strdup(argv[2]);
-	checking = 1;
 	printf("MESSAGE < %s >\n", message);
-	signal(SIGUSR1, )
-    byte_cutting(servPID, message);
+	signal(SIGUSR1, &handle_sigusr);
+	signal(SIGUSR2, &handle_sigusr);
+    take_char(servPID, message);
 	return (0);
 }
