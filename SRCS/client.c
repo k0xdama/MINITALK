@@ -6,13 +6,13 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:54 by pmateo            #+#    #+#             */
-/*   Updated: 2023/11/15 18:37:40 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/11/27 03:26:59 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../INCLUDES/client.h"
 
-int	checking;
+int	checking = 0;
 
 static size_t	ft_strlen(const char *str)
 {
@@ -68,47 +68,46 @@ static int	ft_atoi(const char *str)
 	return (num);
 }
 
-void	handler_usr(int signo)
-{
-	if (signo == SIGUSR2)
-		checking = 0;
-}
 
-void	byte_cutting(pid_t servPID, char *message)
+
+void	cut_send(pid_t servPID, char c)
 {
 	int	i;
-	int	bytesent = 1;
-	char c;
 	char mask;
 	
-	c = 0;
-	while (checking)
+	i = 7;
+	mask = 1;
+	while (i >= 0)
 	{
-		i = 0;
-		c = *message;
-		mask = 1;
-		while (i++ < 8)
+		mask = mask & c;
+		if (mask == 0)
 		{
-			mask = mask & c;
-			if (mask == 0)
-			{
-				send_sigusr(servPID, 1);
-				printf("SIGUSR1 sent !\n");
-			}
-			else
-			{
-				send_sigusr(servPID, 2);
-				printf("SIGUSR2 sent !\n");
-			}
-			printf("byte sent = %d\n", bytesent);
-			bytesent++;
-			mask = 1;
-			mask = mask << i;
+			send_sigusr(servPID, 1);
+			printf("SIGUSR1 sent !\n");			}
+		else
+		{
+			send_sigusr(servPID, 2);
+			printf("SIGUSR2 sent !\n");
 		}
-		pause();
+		printf("byte sent = %d\n", i;
+		i--;
+		mask = 1;
+		mask = mask << i;
+		while (checking != 1)
+			pause();
+		checking = 0;
+	}
+}
+
+void	take_char(pid_t servPID, char *message)
+{
+	while(message)
+	{
+		cut_send(servPID, *message);
 		message++;
 	}
-	printf("Le message a ete envoye\n");
+	printf("MESSAGE SEND\n");
+	return;
 }
 
 void	send_sigusr(pid_t servPID, int choice)
@@ -126,10 +125,17 @@ void	send_sigusr(pid_t servPID, int choice)
 		printf("Echec de l'envoi d'un signal !");
 }
 
+void	handle_sigusr(int signo)
+{
+	if(signo == SIGUSR1)
+		checking = 1;
+	else
+		printf("MESSAGE RECEIVED BY THE SERVER <3\n");
+}
+
 int main(int argc, char *argv[])
 {
     pid_t servPID;
-	struct sigaction	msignal;
 	char	*message;
 	
 	if (argc != 3)
@@ -137,12 +143,8 @@ int main(int argc, char *argv[])
     servPID = (pid_t)ft_atoi(argv[1]);
 	message = ft_strdup(argv[2]);
 	checking = 1;
-	msignal.sa_handler = &handler_usr;
-	msignal.sa_flags = 0;
-	sigemptyset(&msignal.sa_mask);
-	sigaction(SIGUSR1, &msignal, 0);
-	sigaction(SIGUSR2, &msignal, 0);
+	printf("MESSAGE < %s >\n", message);
+	signal(SIGUSR1, )
     byte_cutting(servPID, message);
-	free(message);
 	return (0);
 }
