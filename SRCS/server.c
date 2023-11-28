@@ -6,7 +6,7 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:57 by pmateo            #+#    #+#             */
-/*   Updated: 2023/11/27 21:18:15 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/11/28 20:17:25 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,32 @@ size_t	ft_strlen(const char *str)
 	while (str[i] != '\0')
 		i++;
 	return (i);
+}
+
+void	*ft_calloc(size_t num, size_t size)
+{
+	void	*buffer;
+	size_t	i;
+	size_t	tmp;
+
+	i = 0;
+	if (num == 0 || size == 0)
+	{
+		num = 1;
+		size = 1;
+	}
+	tmp = num * size;
+	if ((tmp / size) != num)
+		return (NULL);
+	buffer = (void *)malloc(size * num);
+	if (!buffer)
+		return (NULL);
+	while (i < num * size)
+	{
+		((unsigned char *)buffer)[i] = 0;
+		i++;
+	}
+	return (buffer);
 }
 
 char	*ft_strjoin(char const *s1, char const *s2)
@@ -94,6 +120,10 @@ void	handler_sig(int signo, siginfo_t *info, void __attribute__((unused)) *conte
 	{
 		kill(senderPID, SIGUSR2);
 		printf("CLIENT'S MESSAGE : < %s >\n", message);
+		free(message);
+		message = ft_calloc(1, 1);
+		bit = 0;
+		c = 0;
 	}
 }
 
@@ -102,8 +132,7 @@ int	main(void)
 	pid_t	pid;
 	struct sigaction	msignal;
 
-	message = malloc(sizeof(char));
-	message[0] = '\0';
+	message = ft_calloc(1, 1);
 	msignal.sa_sigaction = &handler_sig;
 	msignal.sa_flags = SA_SIGINFO;
 	sigemptyset(&msignal.sa_mask);
