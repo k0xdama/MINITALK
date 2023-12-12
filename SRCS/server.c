@@ -6,7 +6,7 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:57 by pmateo            #+#    #+#             */
-/*   Updated: 2023/11/28 20:17:25 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/12/12 21:17:51 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,42 +88,51 @@ static char	add_bit(char c, size_t bit)
 	return (c);
 }
 
+void	print_and_clear(pid_t senderPID, size_t *bit, char *c)
+{
+	kill(senderPID, SIGUSR2);
+	printf("CLIENT'S MESSAGE : < %s >\n", message);
+	free(message);
+	message = ft_calloc(1, 1);
+	*bit = 0;
+	*c = 0;
+}
 
 void	handler_sig(int signo, siginfo_t *info, void __attribute__((unused)) *context)
 {
 	pid_t	senderPID;
 	static size_t	bit;
 	static char	c;
-	static char	ptrc[2];
+	char *tmp;
 	
 	senderPID = info->si_pid;
-	ptrc[1] = '\0';
 	if (bit < 8)
 	{
-		if (signo == SIGUSR1)
-			bit++;
-		else if (signo == SIGUSR2)
-		{
+		if (signo == SIGUSR2)
 			c = add_bit(c, bit);
-			bit++;
-		}
+		bit++;
 		kill(senderPID, SIGUSR1);
 	}
 	if (bit == 8 && c)
 	{
-		ptrc[0] = c;
-		message = ft_strjoin(message, ptrc);
+		tmp = message;
+		message = ft_strjoin(message, &c);
+		free(tmp);
+		tmp = NULL;
 		bit = 0;
-		c = 0;
+		c = 0;	
 	}
 	else if (bit == 8 && !c)
+		print_and_clear(senderPID, &bit, &c);
+}
+
+void	sigint_exit(int signo)
+{
+	if (signo == SIGINT)
 	{
-		kill(senderPID, SIGUSR2);
-		printf("CLIENT'S MESSAGE : < %s >\n", message);
 		free(message);
-		message = ft_calloc(1, 1);
-		bit = 0;
-		c = 0;
+		message = NULL;
+		exit(EXIT_SUCCESS);
 	}
 }
 
@@ -138,6 +147,7 @@ int	main(void)
 	sigemptyset(&msignal.sa_mask);
 	sigaction(SIGUSR1, &msignal, 0);
 	sigaction(SIGUSR2, &msignal, 0);
+	signal(SIGINT, &sigint_exit);
 	pid = getpid();
 	printf("SERVER READY !\nSERVER PID [%d]\nPENDING...\n", (int)pid);
 	while (1)

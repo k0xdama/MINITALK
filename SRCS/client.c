@@ -6,7 +6,7 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:54 by pmateo            #+#    #+#             */
-/*   Updated: 2023/11/28 19:38:35 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/12/12 19:24:48 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@ static char	*ft_strdup(const char *s1)
 	size_t	size;
 	char	*s2;
 
+	if (s1 == NULL)
+		return (NULL); // a corriger dans LIBFT
 	size = ft_strlen(s1) + 1;
 	s2 = malloc(size * sizeof(char));
 	if (s2 == NULL)
@@ -125,12 +127,17 @@ static	void	take_char(pid_t servPID, char *message)
 	return;
 }
 
-void	handle_sigusr(int signo)
+void	handle_sig(int signo)
 {
 	if (signo == SIGUSR1)
 		checking = 1;
 	else if (signo == SIGUSR2)
 		printf("MESSAGE RECEIVED BY THE SERVER <3\n");
+	else if (signo == SIGINT)
+	{
+		free(message);
+		
+	}
 }
 
 int main(int argc, char *argv[])
@@ -143,8 +150,11 @@ int main(int argc, char *argv[])
     servPID = (pid_t)ft_atoi(argv[1]);
 	message = ft_strdup(argv[2]);
 	printf("MESSAGE < %s >\n", message);
-	signal(SIGUSR1, &handle_sigusr);
-	signal(SIGUSR2, &handle_sigusr);
+	signal(SIGUSR1, &handle_sig);
+	signal(SIGUSR2, &handle_sig);
+	signal(SIGINT, &handle_sig);
     take_char(servPID, message);
+	free(message);
+	message = NULL;
 	return (0);
 }
