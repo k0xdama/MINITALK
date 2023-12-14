@@ -6,7 +6,7 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:57 by pmateo            #+#    #+#             */
-/*   Updated: 2023/12/12 21:17:51 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/12/14 02:04:29 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ static char	add_bit(char c, size_t bit)
 	char	mask;
 
 	mask = 1;
-	mask = mask << bit;
+	mask <<= bit;
 	c = c | mask;
 	return (c);
 }
@@ -136,22 +136,28 @@ void	sigint_exit(int signo)
 	}
 }
 
-int	main(void)
+int	main(int argc, char *argv[])
 {
 	pid_t	pid;
 	struct sigaction	msignal;
 
-	message = ft_calloc(1, 1);
+	if (argc != 1)
+	{
+		printf("### THIS PROGRAM REQUIRES NO ARGUMENTS  ! ###\n");
+		exit(EXIT_FAILURE);
+	}
 	msignal.sa_sigaction = &handler_sig;
 	msignal.sa_flags = SA_SIGINFO;
 	sigemptyset(&msignal.sa_mask);
 	sigaction(SIGUSR1, &msignal, 0);
 	sigaction(SIGUSR2, &msignal, 0);
 	signal(SIGINT, &sigint_exit);
+	message = ft_calloc(1, 1);
 	pid = getpid();
 	printf("SERVER READY !\nSERVER PID [%d]\nPENDING...\n", (int)pid);
 	while (1)
 		pause();
 	free(message);
+	message = NULL;
 	return (0);
 }

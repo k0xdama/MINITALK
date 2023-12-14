@@ -6,7 +6,7 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:54 by pmateo            #+#    #+#             */
-/*   Updated: 2023/12/12 19:24:48 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/12/14 02:04:18 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,17 +72,11 @@ static int	ft_atoi(const char *str)
 
 static	void	send_sigusr(pid_t servPID, int choice)
 {
-	if (servPID <= 0)
-		printf("Le PID renseigne est invalide");
-	else if (choice != -1)
-	{
-		if (choice == 1)
-			kill(servPID, SIGUSR1);
-		else if (choice == 2)
-			kill(servPID, SIGUSR2);
-	}
-	else
-		printf("Echec de l'envoi d'un signal !");
+	
+	if (choice == 1)
+		kill(servPID, SIGUSR1);
+	else if (choice == 2)
+		kill(servPID, SIGUSR2);
 }
 
 static	void	cut_send(pid_t servPID, char c)
@@ -96,19 +90,13 @@ static	void	cut_send(pid_t servPID, char c)
 	{
 		mask = mask & c;
 		if (mask == 0)
-		{
 			send_sigusr(servPID, 1);
-			printf("SIGUSR1 sent !\n");			}
 		else
-		{
 			send_sigusr(servPID, 2);
-			printf("SIGUSR2 sent !\n");
-		}
-		printf("bit index = %d\n", bit);
 		bit++;
 		mask = 1;
 		mask = mask << bit;
-		while (checking != 1)
+		while (!checking)
 			pause();
 		checking = 0;
 	}
@@ -132,29 +120,29 @@ void	handle_sig(int signo)
 	if (signo == SIGUSR1)
 		checking = 1;
 	else if (signo == SIGUSR2)
-		printf("MESSAGE RECEIVED BY THE SERVER <3\n");
-	else if (signo == SIGINT)
 	{
-		free(message);
-		
+		printf("MESSAGE RECEIVED BY THE SERVER <3\n");
+		exit(EXIT_SUCCESS);
 	}
 }
 
 int main(int argc, char *argv[])
 {
-    pid_t servPID;
-	char	*message;
+    pid_t serv_pid;
 	
 	if (argc != 3)
-        return (1);
-    servPID = (pid_t)ft_atoi(argv[1]);
-	message = ft_strdup(argv[2]);
-	printf("MESSAGE < %s >\n", message);
+	{
+		printf("./client <'SERVER PID'> <'MESSAGE TO SEND'>\n");
+		exit(EXIT_FAILURE);
+	}
+    serv_pid = (pid_t)ft_atoi(argv[1]);
+	if (!serv_pid)
+	{
+		printf("# INVALID PID ! #\n");
+		exit(EXIT_FAILURE);
+	}
 	signal(SIGUSR1, &handle_sig);
 	signal(SIGUSR2, &handle_sig);
-	signal(SIGINT, &handle_sig);
-    take_char(servPID, message);
-	free(message);
-	message = NULL;
+    take_char(serv_pid, argv[2]);
 	return (0);
 }
