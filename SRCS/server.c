@@ -6,7 +6,7 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:57 by pmateo            #+#    #+#             */
-/*   Updated: 2023/12/14 02:04:29 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/12/16 22:42:03 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,14 +78,16 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (str);
 }
 
-static char	add_bit(char c, size_t bit)
+static void	join_char(char *message, size_t *bit, char *c)
 {
-	char	mask;
+	char *tmp;
 
-	mask = 1;
-	mask <<= bit;
-	c = c | mask;
-	return (c);
+	tmp = message;
+	message = ft_strjoin(message, c);
+	free(tmp);
+	tmp = NULL;
+	*bit = 0;
+	*c = 0;
 }
 
 void	print_and_clear(pid_t senderPID, size_t *bit, char *c)
@@ -98,30 +100,28 @@ void	print_and_clear(pid_t senderPID, size_t *bit, char *c)
 	*c = 0;
 }
 
-void	handler_sig(int signo, siginfo_t *info, void __attribute__((unused)) *context)
+void	handler_sig(int signo, siginfo_t *info, void *context)
 {
 	pid_t	senderPID;
 	static size_t	bit;
 	static char	c;
-	char *tmp;
+	char	mask;
 	
+	(void)context;
 	senderPID = info->si_pid;
 	if (bit < 8)
 	{
 		if (signo == SIGUSR2)
-			c = add_bit(c, bit);
+			{
+				mask = 1;
+				mask <<= bit;
+				c = c | mask;
+			}
 		bit++;
 		kill(senderPID, SIGUSR1);
 	}
 	if (bit == 8 && c)
-	{
-		tmp = message;
-		message = ft_strjoin(message, &c);
-		free(tmp);
-		tmp = NULL;
-		bit = 0;
-		c = 0;	
-	}
+		join_char(message, &bit, &c);
 	else if (bit == 8 && !c)
 		print_and_clear(senderPID, &bit, &c);
 }
@@ -136,14 +136,14 @@ void	sigint_exit(int signo)
 	}
 }
 
-int	main(int argc, char *argv[])
+int	main(int argc, char __attribute__((unused)) *argv[])
 {
 	pid_t	pid;
 	struct sigaction	msignal;
 
 	if (argc != 1)
 	{
-		printf("### THIS PROGRAM REQUIRES NO ARGUMENTS  ! ###\n");
+		printf("### THIS PROGRAM REQUIRES NO ARGUMENTS ! ###\n");
 		exit(EXIT_FAILURE);
 	}
 	msignal.sa_sigaction = &handler_sig;
@@ -157,7 +157,5 @@ int	main(int argc, char *argv[])
 	printf("SERVER READY !\nSERVER PID [%d]\nPENDING...\n", (int)pid);
 	while (1)
 		pause();
-	free(message);
-	message = NULL;
 	return (0);
 }

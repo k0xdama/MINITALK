@@ -6,54 +6,13 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:54 by pmateo            #+#    #+#             */
-/*   Updated: 2023/12/14 02:04:18 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/12/16 22:20:03 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../INCLUDES/minitalk.h"
 
 int	checking = 0;
-
-static size_t	ft_strlen(const char *str)
-{
-	size_t	i;
-
-	i = 0;
-	while (str[i] != '\0')
-		i++;
-	return (i);
-}
-
-static size_t	ft_strlcpy(char *dest, const char *src, size_t size)
-{
-	unsigned int	i;
-
-	i = 0;
-	if (size == 0)
-		return (ft_strlen(src));
-	while (src[i] != '\0' && i < size - 1)
-	{
-		dest[i] = src[i];
-		i++;
-	}
-	dest[i] = '\0';
-	return (ft_strlen(src));
-}
-
-static char	*ft_strdup(const char *s1)
-{
-	size_t	size;
-	char	*s2;
-
-	if (s1 == NULL)
-		return (NULL); // a corriger dans LIBFT
-	size = ft_strlen(s1) + 1;
-	s2 = malloc(size * sizeof(char));
-	if (s2 == NULL)
-		return (NULL);
-	ft_strlcpy(s2, s1, size);
-	return (s2);
-}
 
 static int	ft_atoi(const char *str)
 {
