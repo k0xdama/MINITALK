@@ -6,7 +6,7 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:54 by pmateo            #+#    #+#             */
-/*   Updated: 2023/12/16 22:20:03 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/12/18 20:02:27 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ static	void	cut_send(pid_t servPID, char c)
 		mask = 1;
 		mask = mask << bit;
 		while (!checking)
-			pause();
+			usleep(100);
 		checking = 0;
 	}
 }

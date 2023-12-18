@@ -6,7 +6,7 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:57 by pmateo            #+#    #+#             */
-/*   Updated: 2023/12/16 22:42:03 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/12/18 20:33:33 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,16 +78,29 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (str);
 }
 
-static void	join_char(char *message, size_t *bit, char *c)
+void	join_char(char *message, size_t *bit, char *c)
 {
 	char *tmp;
+	char	ptrc[2];
 
+	ptrc[0] = *c;
+	ptrc[1] = '\0';
 	tmp = message;
-	message = ft_strjoin(message, c);
+	message = ft_strjoin(message, ptrc);
 	free(tmp);
 	tmp = NULL;
 	*bit = 0;
 	*c = 0;
+}
+
+char	add_bit(size_t	bit, char c)
+{
+	char	mask;
+
+	mask = 1;
+	mask <<= bit;
+	c = c | mask;
+	return (c);
 }
 
 void	print_and_clear(pid_t senderPID, size_t *bit, char *c)
@@ -105,23 +118,27 @@ void	handler_sig(int signo, siginfo_t *info, void *context)
 	pid_t	senderPID;
 	static size_t	bit;
 	static char	c;
-	char	mask;
+	char	*tmp;
 	
 	(void)context;
 	senderPID = info->si_pid;
 	if (bit < 8)
 	{
 		if (signo == SIGUSR2)
-			{
-				mask = 1;
-				mask <<= bit;
-				c = c | mask;
-			}
+			add_bit(bit, c);
 		bit++;
 		kill(senderPID, SIGUSR1);
 	}
+	printf("c = %c\n", c);
 	if (bit == 8 && c)
-		join_char(message, &bit, &c);
+	{
+		tmp = message;
+		message = ft_strjoin(message, &c);
+		free(tmp);
+		tmp = NULL;
+		bit = 0;
+		c = 0;
+	}
 	else if (bit == 8 && !c)
 		print_and_clear(senderPID, &bit, &c);
 }
