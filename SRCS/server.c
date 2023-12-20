@@ -6,7 +6,7 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:57 by pmateo            #+#    #+#             */
-/*   Updated: 2023/12/18 20:33:33 by pmateo           ###   ########.fr       */
+/*   Updated: 2023/12/19 22:11:08 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,20 +78,20 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (str);
 }
 
-void	join_char(char *message, size_t *bit, char *c)
-{
-	char *tmp;
-	char	ptrc[2];
+// void	join_char(char *message, size_t *bit, char *c)
+// {
+// 	char *tmp;
+// 	char	ptrc[2];
 
-	ptrc[0] = *c;
-	ptrc[1] = '\0';
-	tmp = message;
-	message = ft_strjoin(message, ptrc);
-	free(tmp);
-	tmp = NULL;
-	*bit = 0;
-	*c = 0;
-}
+// 	ptrc[0] = *c;
+// 	ptrc[1] = '\0';
+// 	tmp = message;
+// 	message = ft_strjoin(message, ptrc);
+// 	free(tmp);
+// 	tmp = NULL;
+// 	*bit = 0;
+// 	*c = 0;
+// }
 
 char	add_bit(size_t	bit, char c)
 {
@@ -108,6 +108,7 @@ void	print_and_clear(pid_t senderPID, size_t *bit, char *c)
 	kill(senderPID, SIGUSR2);
 	printf("CLIENT'S MESSAGE : < %s >\n", message);
 	free(message);
+	message = NULL;
 	message = ft_calloc(1, 1);
 	*bit = 0;
 	*c = 0;
@@ -125,11 +126,10 @@ void	handler_sig(int signo, siginfo_t *info, void *context)
 	if (bit < 8)
 	{
 		if (signo == SIGUSR2)
-			add_bit(bit, c);
+			c = add_bit(bit, c);
 		bit++;
 		kill(senderPID, SIGUSR1);
 	}
-	printf("c = %c\n", c);
 	if (bit == 8 && c)
 	{
 		tmp = message;
@@ -173,6 +173,6 @@ int	main(int argc, char __attribute__((unused)) *argv[])
 	pid = getpid();
 	printf("SERVER READY !\nSERVER PID [%d]\nPENDING...\n", (int)pid);
 	while (1)
-		pause();
+		usleep(300);
 	return (0);
 }
