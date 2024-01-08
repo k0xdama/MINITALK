@@ -6,13 +6,14 @@
 #    By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/12/02 19:28:28 by pmateo            #+#    #+#              #
-#    Updated: 2023/12/04 22:13:42 by pmateo           ###   ########.fr        #
+#    Updated: 2024/01/08 19:26:02 by pmateo           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC = cc
 FLAGS = -Wall -Werror -Wextra
 RM = rm -f
+.DEFAULT_GOAL := all
 
 NAMECLIENT = client
 NAMESERVER = server
@@ -35,55 +36,51 @@ INCFILES_BONUS = ${DIRINC}/minitalk_bonus.h
 
 DIRLIBFT = ./LIBFT
 LIBFT = ${DIRLIBFT}/libft.a
-DIRPRINTF = ./PRINTF
-PRINTF = ${DIRPRINTF}/libftprintf.a
 
 ${LIBFT}:
 	@${MAKE} -s -C ${DIRLIBFT}
-${PRINTF}:
-	@${MAKE} -s -C ${DIRPRINTF}
 	
-${NAMECLIENT}: ${OBJCLIENT} ${LIBFT} ${PRINTF} ${INCFILES}
-	${CC} ${FLAGS} -o ${NAMECLIENT} ${OBJCLIENT} -I ${DIRINC} -L ${DIRLIBFT} -L ${DIRPRINTF} -lft -lftprintf
+${NAMECLIENT}: ${OBJCLIENT} ${LIBFT} ${INCFILES}
+	@${CC} ${FLAGS} -o ${NAMECLIENT} ${OBJCLIENT} -I ${DIRINC} -I ${DIRLIBFT}/INCLUDES -L ${DIRLIBFT} -lft 
+	@echo "\033[1;5;35m# MANDATORY CLIENT'S PART READY ! #\033[0m"
 
-${NAMESERVER}: ${OBJSERVER} ${LIBFT} ${PRINTF} ${INCFILES}
-	${CC} ${FLAGS} -o ${NAMESERVER} ${OBJSERVER} -I ${DIRINC} -L ${DIRLIBFT} -L ${DIRPRINTF} -lft -lftprintf
+${NAMESERVER}: ${OBJSERVER} ${LIBFT} ${INCFILES}
+	@${CC} ${FLAGS} -o ${NAMESERVER} ${OBJSERVER} -I ${DIRINC} -I ${DIRLIBFT}/INCLUDES -L ${DIRLIBFT} -lft
+	@echo "\033[1;5;35m# MANDATORY SERVER'S PART READY ! #\033[0m"
 
-${NAMECLIENT_BONUS}: ${OBJCLIENT_BONUS} ${LIBFT} ${PRINTF} ${INCFILES_BONUS}
-	${CC} ${FLAGS} -o ${NAMECLIENT_BONUS} ${OBJCLIENT_BONUS} -I ${DIRINC} -L ${DIRLIBFT} -L ${DIRPRINTF} -lft -lftprintf
+${NAMECLIENT_BONUS}: ${OBJCLIENT_BONUS} ${LIBFT} ${INCFILES_BONUS}
+	@${CC} ${FLAGS} -o ${NAMECLIENT_BONUS} ${OBJCLIENT_BONUS} -I ${DIRINC} -I ${DIRLIBFT}/INCLUDES -L ${DIRLIBFT} -lft
+	@echo "\033[1;5;35m# BONUS CLIENT'S PART READY ! #\033[0m"
 
-${NAMESERVER_BONUS}: ${OBJSERVER_BONUS} ${LIBFT} ${PRINTF} ${INCFILES_BONUS}
-	${CC} ${FLAGS} -o ${NAMESERVER_BONUS} ${OBJSERVER_BONUS} -I ${DIRINC} -L ${DIRLIBFT} -L ${DIRPRINTF} -lft -lftprintf
+${NAMESERVER_BONUS}: ${OBJSERVER_BONUS} ${LIBFT} ${INCFILES_BONUS}
+	@${CC} ${FLAGS} -o ${NAMESERVER_BONUS} ${OBJSERVER_BONUS} -I ${DIRINC} -I ${DIRLIBFT}/INCLUDES -L ${DIRLIBFT} -lft
+	@echo "\033[1;5;35m# BONUS SERVER'S PART READY ! #\033[0m"
 
 ${OBJCLIENT}: %.o: %.c ${INCFILES}
-	${CC} ${FLAGS} -o $@ -c $< -I ${DIRINC} -I ${DIRLIBFT} -I ${DIRPRINTF}/INCLUDES
+	@${CC} ${FLAGS} -o $@ -c $< -I ${DIRINC} -I ${DIRLIBFT}/INCLUDES
 
 ${OBJSERVER}: %.o: %.c ${INCFILES}
-	${CC} ${FLAGS} -o $@ -c $< -I ${DIRINC} -I ${DIRLIBFT} -I ${DIRPRINTF}/INCLUDES
+	@${CC} ${FLAGS} -o $@ -c $< -I ${DIRINC} -I ${DIRLIBFT}/INCLUDES
 
 ${OBJCLIENT_BONUS}: %.o: %.c ${INCFILES_BONUS}
-	${CC} ${FLAGS} -o $@ -c $< -I ${DIRINC} -I ${DIRLIBFT} -I ${DIRPRINTF}/INCLUDES
+	@${CC} ${FLAGS} -o $@ -c $< -I ${DIRINC} -I ${DIRLIBFT}/INCLUDES
 
 ${OBJSERVER_BONUS}: %.o: %.c ${INCFILES_BONUS}
-	${CC} ${FLAGS} -o $@ -c $< -I ${DIRINC} -I ${DIRLIBFT} -I ${DIRPRINTF}/INCLUDES
+	@${CC} ${FLAGS} -o $@ -c $< -I ${DIRINC} -I ${DIRLIBFT}/INCLUDES
 
 all: ${NAMECLIENT} ${NAMESERVER}
-		@echo "\033[1;5;35m# MANDATORY PART READY ! #\033[0m"
 
 bonus: ${NAMECLIENT_BONUS} ${NAMESERVER_BONUS}
-		@echo "\033[1;5;35m# BONUS PART READY ! #\033[0m"
 
 clean: 
 		@${MAKE} -s -C ${DIRLIBFT} clean
-		@${MAKE} -s -C ${DIRPRINTF} clean
 		@${RM} ${OBJCLIENT} ${OBJSERVER} ${OBJCLIENT_BONUS} ${OBJSERVER_BONUS}
-		@echo "\033[1;35m# No more object files. #\033[0m"
+		@echo "\033[1;9;35m# No more object files. #\033[0m"
 	
 fclean: clean
 		@${MAKE} -s -C ${DIRLIBFT} fclean
-		@${MAKE} -s -C ${DIRPRINTF} fclean
 		@${RM} ${NAMECLIENT} ${NAMESERVER} ${NAMECLIENT_BONUS} ${NAMESERVER_BONUS}
-		@echo "\033[1;35m# No more executable/object files. #\033[0m"
+		@echo "\033[1;9;35m# No more executable files. #\033[0m"
 	
 re: fclean all
 

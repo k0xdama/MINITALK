@@ -6,92 +6,13 @@
 /*   By: pmateo <pmateo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 02:59:57 by pmateo            #+#    #+#             */
-/*   Updated: 2023/12/20 14:24:41 by pmateo           ###   ########.fr       */
+/*   Updated: 2024/01/08 20:45:24 by pmateo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../INCLUDES/minitalk.h"
 
-char	*message;
-
-size_t	ft_strlen(const char *str)
-{
-	size_t	i;
-
-	i = 0;
-	while (str[i] != '\0')
-		i++;
-	return (i);
-}
-
-void	*ft_calloc(size_t num, size_t size)
-{
-	void	*buffer;
-	size_t	i;
-	size_t	tmp;
-
-	i = 0;
-	if (num == 0 || size == 0)
-	{
-		num = 1;
-		size = 1;
-	}
-	tmp = num * size;
-	if ((tmp / size) != num)
-		return (NULL);
-	buffer = (void *)malloc(size * num);
-	if (!buffer)
-		return (NULL);
-	while (i < num * size)
-	{
-		((unsigned char *)buffer)[i] = 0;
-		i++;
-	}
-	return (buffer);
-}
-
-char	*ft_strjoin(char const *s1, char const *s2)
-{
-	unsigned int	i;
-	unsigned int	j;
-	size_t			size;
-	char			*str;
-
-	i = 0;
-	j = 0;
-	size = ft_strlen(s1) + ft_strlen(s2) + 1;
-	str = malloc(size * sizeof(char));
-	if (str == NULL)
-		return (NULL);
-	while (s1[i] != '\0')
-	{
-		str[i] = s1[i];
-		i++;
-	}
-	while (s2[j] != '\0')
-	{
-		str[i] = s2[j];
-		i++;
-		j++;
-	}
-	str[i] = '\0';
-	return (str);
-}
-
-// void	join_char(char *message, size_t *bit, char *c)
-// {
-// 	char *tmp;
-// 	char	ptrc[2];
-
-// 	ptrc[0] = *c;
-// 	ptrc[1] = '\0';
-// 	tmp = message;
-// 	message = ft_strjoin(message, ptrc);
-// 	free(tmp);
-// 	tmp = NULL;
-// 	*bit = 0;
-// 	*c = 0;
-// }
+char	*g_message;
 
 char	add_bit(size_t	bit, char c)
 {
@@ -103,64 +24,64 @@ char	add_bit(size_t	bit, char c)
 	return (c);
 }
 
-void	print_and_clear(pid_t senderPID, size_t *bit, char *c)
+void	print_and_clear(pid_t senderpid, size_t *bit, char *c)
 {
-	kill(senderPID, SIGUSR2);
-	printf("CLIENT'S MESSAGE : < %s >\n", message);
-	free(message);
-	message = NULL;
-	message = ft_calloc(1, 1);
+	kill(senderpid, SIGUSR2);
+	ft_printf("CLIENT'S MESSAGE : < %s >\n", g_message);
+	free(g_message);
+	g_message = NULL;
+	g_message = ft_calloc(1, 1);
 	*bit = 0;
 	*c = 0;
 }
 
 void	handler_sig(int signo, siginfo_t *info, void *context)
 {
-	pid_t	senderPID;
+	pid_t			senderpid;
 	static size_t	bit;
-	static char	c;
-	char	*tmp;
-	
+	static char		c;
+	char			*tmp;
+
 	(void)context;
-	senderPID = info->si_pid;
+	senderpid = info->si_pid;
 	if (bit < 8)
 	{
 		if (signo == SIGUSR2)
 			c = add_bit(bit, c);
 		bit++;
-		kill(senderPID, SIGUSR1);
 	}
 	if (bit == 8 && c)
 	{
-		tmp = message;
-		message = ft_strjoin(message, &c);
+		tmp = g_message;
+		g_message = ft_strjoin(g_message, &c);
 		free(tmp);
 		tmp = NULL;
 		bit = 0;
 		c = 0;
 	}
 	else if (bit == 8 && !c)
-		print_and_clear(senderPID, &bit, &c);
+		print_and_clear(senderpid, &bit, &c);
+	kill(senderpid, SIGUSR1);
 }
 
 void	sigint_exit(int signo)
 {
 	if (signo == SIGINT)
 	{
-		free(message);
-		message = NULL;
+		free(g_message);
+		g_message = NULL;
 		exit(EXIT_SUCCESS);
 	}
 }
 
 int	main(int argc, char __attribute__((unused)) *argv[])
 {
-	pid_t	pid;
+	pid_t				pid;
 	struct sigaction	msignal;
 
 	if (argc != 1)
 	{
-		printf("### THIS PROGRAM REQUIRES NO ARGUMENTS ! ###\n");
+		ft_printf("\033[1;31m#THIS PROGRAM REQUIRES NO ARGUMENTS ! #\n\033[0m");
 		exit(EXIT_FAILURE);
 	}
 	msignal.sa_sigaction = &handler_sig;
@@ -169,10 +90,11 @@ int	main(int argc, char __attribute__((unused)) *argv[])
 	sigaction(SIGUSR1, &msignal, 0);
 	sigaction(SIGUSR2, &msignal, 0);
 	signal(SIGINT, &sigint_exit);
-	message = ft_calloc(1, 1);
+	g_message = ft_calloc(1, 1);
 	pid = getpid();
-	printf("SERVER READY !\nSERVER PID [%d]\nPENDING...\n", (int)pid);
+	ft_printf("\033[1;34mSERVER READY !\n");
+	ft_printf("\033[1;34mSERVER PID [%d]\nPENDING...\n\033[0m", (int)pid);
 	while (1)
-		usleep(300);
+		pause();
 	return (0);
 }
